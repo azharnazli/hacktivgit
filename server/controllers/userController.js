@@ -8,9 +8,20 @@ ax.defaults.headers.common['Authorization'] = `token ${process.env.GITHUB_TOKEN}
 
 class UserController {
 
+  static showUser(req, res) {
+    ax
+      .get(`/user/repos`)
+      .then( ({data})=> {
+        res.status(200).json(data)
+      })
+      .catch(err => {
+        res.status(500).json(err.message)
+      })
+  }
+
   static showRepo(req, res) {
     ax
-      .get(`/users/${req.params.username}/repos`)
+      .get(`/users/${req.body.username}/repos`)
       .then( ({data})=> {
         res.status(200).json(data)
       })
@@ -21,7 +32,7 @@ class UserController {
 
   static getStars(req, res) {
     ax
-      .get(`/users/${req.params.username}/starred`)
+      .get(`/user/starred`)
       .then(({
         data
       }) => {

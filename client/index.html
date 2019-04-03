@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <title>HacktivGit</title>
+</head>
+
+<body>
+
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm">
+          <div id="myRepo"></div>
+        </div>
+        <!-- <div class="col-sm">
+        </div> -->
+        <div class="col-sm">
+          <h1 style="color: orange">HacktivGit</h1>
+          <form style="margin-top:10%" action="" method="POST" onsubmit="newRepository()">
+            <h3>New Repository</h3>
+            <label for="repo-name">Repository Name</label>
+            <input type="text" name="" id="repo-name">
+            <button type="submit" class="btn btn-primary btn-sm" id="">Submit</button>
+          </form>
+          <div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="filtered">
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm">
+            <p style="font-weight: bold">Starred Repos</p>
+            <form action="" method="" id="" onsubmit="getStarList()">
+              <label for="filtered-user">Filtered Username: </label>
+              <input type="text" name="" id="filtered-user">
+              <button type="submit" class="btn btn-primary btn-sm" id="">Search!</button>
+            </form>
+            <div id="starred-repo"></div>
+            <hr class="my-2">
+          </div>
+          <div class="col-sm">
+            <h5>Unstar Repository</h5>
+            <div>
+              <form action="" method="POST" onsubmit="unstar()" >
+                <label for="">Username :</label>
+                <input type="text" id="unstar-username">
+                <br>
+                <label for="">Repository :</label>
+                <input type="text" id="unstar-repository">
+                <br>
+                <button type="submit" class="center-block btn btn-danger btn-sm" id="">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="other" style="margin-bottom: 50px">
+    <div class="container">
+      <p style="font-weight: bold">Search Repo</p>
+      <div>
+        <form action="" method="POST" id="search-username" class="form form-inline" onsubmit="search()">
+          <label for="search-repo">Username: </label>
+          <input type="text" name="search-username" id="user">
+          <button type="submit" class="btn btn-primary btn-sm" id="search-username">Search!</button>
+        </form>
+      </div>
+      <div id="list-user">
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="./js/index.js"></script>
+</body>
+
+</html>
