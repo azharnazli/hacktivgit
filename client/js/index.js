@@ -1,10 +1,17 @@
+function checkLogin() {
+  if (!localStorage.getItem('token')) {
+    $('#login').empty()
+    $('#loginform').show()
+  }
+}
+
+
 function myRepo() {
   $.ajax({
       method: "GET",
       url: `http://localhost:3000/user/`
     })
     .done(mydata => {
-      console.log(mydata)
       $(`#myRepo`).append(`<img src="${mydata[0].owner.avatar_url}"/>`)
       $(`#myRepo`).append(`<h3>${mydata[0].owner.login}</h3>`)
     })
@@ -12,6 +19,9 @@ function myRepo() {
 
 
 function getStarList() {
+  if (event) {
+    event.preventDefault()
+  }
   let filtered = $(`#filtered-user`).val()
   $.ajax({
       method: 'GET',
@@ -24,14 +34,17 @@ function getStarList() {
       <th>Repository Name</th>
     </tr>
     <tr>`
-      if (!filtered.length == 0) {
-        response.forEach((el, idx) => {
-          if (el.owner.login == filtered) {
-            starredRepo += `<td> <a href="${el.owner.html_url}" >${el.owner.login}</a></td>`
-            starredRepo += `<td><a href="${el.html_url}" >${el.name}</a></tr>`
-          }
-        })
 
+
+      if (filtered) {
+        if (filtered.length !== 0) {
+          response.forEach((el, idx) => {
+            if (el.owner.login == filtered) {
+              starredRepo += `<td> <a href="${el.owner.html_url}" >${el.owner.login}</a></td>`
+              starredRepo += `<td><a href="${el.html_url}" >${el.name}</a></tr>`
+            }
+          })
+        }
       } else {
         response.forEach((el, idx) => {
           starredRepo += `<td> <a href="${el.owner.html_url}" >${el.owner.login}</a></td>`
@@ -48,12 +61,6 @@ function getStarList() {
       console.log(`request failed ${textStatus}`)
     })
 }
-
-
-$(document).ready(function () {
-  myRepo()
-  getStarList()
-})
 
 function search() {
   event.preventDefault()
@@ -96,22 +103,22 @@ function newRepository() {
   let repoName = $('#repo-name').val()
 
   $.ajax({
-    method: "POST",
-    url : `http://localhost:3000/user/createRepo`,
-    data : {
-      repoName : repoName
-    }
-  })
-  .done( (newRepo)=> {
-    swal({
-      title: `success create ${repoName}`,
-      button: "OK"
+      method: "POST",
+      url: `http://localhost:3000/user/createRepo`,
+      data: {
+        repoName: repoName
+      }
     })
-    $('#repo-name').val('')
-  })
-  .fail(function (jqXHR, textStatus) {
-    console.log(`request failed ${textStatus}`)
-  })
+    .done((newRepo) => {
+      swal({
+        title: `success create ${newRepo}`,
+        button: "OK"
+      })
+      $('#repo-name').val('')
+    })
+    .fail(function (jqXHR, textStatus) {
+      console.log(`request failed ${textStatus}`)
+    })
 }
 
 function unstar() {
@@ -121,17 +128,107 @@ function unstar() {
   console.log(username)
   console.log(repository)
   $.ajax({
-    url: `http://localhost:3000/user/unstar/${username}/${repository}`,
-    method: 'DELETE'
-  })
-  .done( ()=> {
-    swal({
-      title : `Unstar ${username} with repository ${repository} success`
+      url: `http://localhost:3000/user/unstar/${username}/${repository}`,
+      method: 'DELETE'
     })
+    .done(() => {
+      swal({
+        title: `Unstar ${username} with repository ${repository} success`
+      })
+      getStarList()
+    })
+    .fail(function (jqXHR, textStatus) {
+      console.log(`request failed ${textStatus}`)
+    })
+
+}
+
+// function onSignIn(googleUser) {
+//   const profile = googleUser.getBasicProfile();
+//   console.log('ID: ' + profile.getId()); 
+//   console.log('Name: ' + profile.getName());
+//   console.log('Image URL: ' + profile.getImageUrl());
+//   console.log('Email: ' + profile.getEmail()); 
+//   const id_token = googleUser.getAuthResponse().id_token
+
+//   $.ajax({
+//     url : `http://localhost:3000/user/login`,
+//     method : "POST",
+//     data : {
+//       token : id_token
+//     }
+//   })
+//   .done( (data)=> {
+//     localStorage.setItem('token', id_token)
+//   })
+//   .fail(function (jqXHR, textStatus) {
+//     console.log(`request failed ${textStatus}`)
+//   })
+// }
+
+function initialize() {
+  gapi.load('auth2', function() {
+    gapi.auth2.init({ client_id: `248246929203-7t0997i779dpose00fq3i982mi1v7ono.apps.googleusercontent.com`})
+    .then(()=> {
+      renderButton()
+    })
+  })
+}
+
+function renderButton() {
+  gapi.signin2.render('my-signin2', {
+    'scope': 'profile email',
+    'width': 240,
+    'height': 50,
+    'longtitle': true,
+    'theme': 'dark',
+    'onsuccess': onSuccess,
+    'onfailure': onFailure
+  });
+}
+
+function onSuccess(googleUser) {
+  // console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
+  const profile = googleUser.getBasicProfile();
+    console.log('ID: ' + profile.getId()); 
+    console.log('Name: ' + profile.getName());
+    console.log('Image URL: ' + profile.getImageUrl());
+    console.log('Email: ' + profile.getEmail()); 
+    const id_token = googleUser.getAuthResponse().id_token
+  
+    $.ajax({
+      url : `http://localhost:3000/user/login`,
+      method : "POST",
+      data : {
+        token : id_token
+      }
+    })
+    .done( (data)=> {
+      localStorage.setItem('token', id_token)
+      $('#loginform').hide()
+      $('#login').show()
+    })
+    .fail(function (jqXHR, textStatus) {
+      console.log(`request failed ${textStatus}`)
+    })
+  }
+  function onFailure(error) {
+    console.log(error);
+  }
+  
+  function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+      localStorage.removeItem('token')
+      console.log('User signed out.');
+      $('#login').hide()
+      $('#loginform').show()
+    });
+  }
+  
+  
+  $(document).ready(function () {
+    checkLogin()
+    myRepo()
     getStarList()
   })
-  .fail(function (jqXHR, textStatus) {
-    console.log(`request failed ${textStatus}`)
-  })
-  
-}
